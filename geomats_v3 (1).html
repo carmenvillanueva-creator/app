@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoMats 🔷 Aprende Geometría</title>
+<style>
+/* Fuentes del sistema — sin necesidad de internet */
+
+:root {
+  --purple: #7C3AED;
+  --purple-light: #A78BFA;
+  --pink: #EC4899;
+  --cyan: #06B6D4;
+  --green: #10B981;
+  --orange: #F59E0B;
+  --red: #EF4444;
+  --yellow: #FCD34D;
+  --bg: #0F0A1E;
+  --bg2: #1A1035;
+  --bg3: #241848;
+  --card: #1E1440;
+  --text: #F1E8FF;
+  --text2: #C4B5FD;
+  --border: rgba(124,58,237,0.3);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Nunito', 'Varela Round', 'Comic Sans MS', 'Trebuchet MS', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Stars background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 75%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 65% 30%, rgba(167,139,250,0.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 15% 55%, rgba(6,182,212,0.5) 0%, transparent 100%),
+    radial-gradient(2px 2px at 85% 70%, rgba(236,72,153,0.4) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.screen { display:none; position:relative; z-index:1; }
+.screen.active { display:block; }
+
+/* ══ SHARED COMPONENTS ══ */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 28px; border-radius: 50px; border: none;
+  font-family: 'Nunito', 'Varela Round', 'Trebuchet MS', Arial, sans-serif; font-size: 16px; font-weight: 800;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: linear-gradient(135deg,var(--purple),var(--pink)); color:#fff; box-shadow: 0 4px 20px rgba(124,58,237,0.4); }
+.btn-secondary { background: var(--bg3); color: var(--text); border: 2px solid var(--border); }
+.btn-green { background: linear-gradient(135deg,#059669,var(--green)); color:#fff; box-shadow: 0 4px 20px rgba(16,185,129,0.4); }
+.btn-cyan { background: linear-gradient(135deg,#0891B2,var(--cyan)); color:#fff; box-shadow: 0 4px 20px rgba(6,182,212,0.4); }
+.btn-orange { background: linear-gradient(135deg,#D97706,var(--orange)); color:#fff; box-shadow: 0 4px 20px rgba(245,158,11,0.4); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* ══ SCREEN 0: HOME ══ */
+#home {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 20px; text-align: center;
+}
+.home-logo {
+  font-family: 'Fredoka One', 'Baloo 2', 'Comic Sans MS', 'Trebuchet MS', Arial, sans-serif;
+  font-size: clamp(56px,12vw,96px);
+  background: linear-gradient(135deg,var(--purple-light),var(--pink),var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1; margin-bottom: 8px;
+  filter: drop-shadow(0 0 30px rgba(124,58,237,0.5));
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%,100% { filter: drop-shadow(0 0 20px rgba(124,58,237,0.4)); }
+  50% { filter: drop-shadow(0 0 40px rgba(236,72,153,0.6)); }
+}
+.home-sub {
+  font-size: 18px; color: var(--text2); margin-bottom: 48px; font-weight: 600;
+}
+.home-figures {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+.fig-icon {
+  width: 70px; height: 70px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 16px;
+  background: var(--bg3);
+  border: 2px solid var(--border);
+  font-size: 32px;
+  animation: float 3s ease-in-out infinite;
+  transition: transform 0.2s;
+}
+.fig-icon:hover { transform: scale(1.2) rotate(10deg) !important; }
+.fig-icon:nth-child(1) { animation-delay:0s; }
+.fig-icon:nth-child(2) { animation-delay:0.4s; }
+.fig-icon:nth-child(3) { animation-delay:0.8s; }
+.fig-icon:nth-child(4) { animation-delay:1.2s; }
+.fig-icon:nth-child(5) { animation-delay:1.6s; }
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.home-menu {
+  display: flex; flex-direction: column; gap: 14px;
+  width: 100%; max-width: 360px;
+}
+.menu-btn {
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 24px; border-radius: 16px; border: none;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text); cursor: pointer;
+  transition: all 0.25s; font-family: 'Nunito',sans-serif;
+  text-align: left;
+}
+.menu-btn:hover { transform: translateX(8px); border-color: var(--purple-light); background: var(--bg3); }
+.menu-btn .icon { font-size: 28px; }
+.menu-btn .info { flex:1; }
+.menu-btn .title { font-size: 17px; font-weight: 800; margin-bottom: 2px; }
+.menu-btn .desc { font-size: 13px; color: var(--text2); font-weight: 600; }
+.menu-btn .arrow { font-size: 20px; color: var(--purple-light); }
+
+/* ══ SCREEN: GLOSARIO ══ */
+#glosario { min-height:100vh; padding:20px; max-width:700px; margin:0 auto; }
+.screen-header {
+  display:flex; align-items:center; gap:12px;
+  padding: 20px 0 24px;
+}
+.back-btn {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); padding: 8px 16px; border-radius: 50px;
+  cursor:pointer; font-family:'Nunito','Trebuchet MS',Arial,sans-serif; font-weight:700; font-size:14px;
+  transition:all 0.2s; border:none;
+}
+.back-btn:hover { background: var(--bg2); }
+.screen-title {
+  font-family:'Fredoka One','Comic Sans MS','Trebuchet MS',Arial,sans-serif; font-size:28px;
+  background:linear-gradient(135deg,var(--purple-light),var(--cyan));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.glosario-grid { display:flex; flex-direction:column; gap:12px; }
+.glosario-item {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:16px 20px; cursor:pointer; transition:all 0.2s;
+}
+.glosario-item:hover { border-color:var(--purple-light); transform:translateX(4px); }
+.glosario-term {
+  display:flex; align-items:center; justify-content:space-between;
+}
+.glosario-term .name { font-size:17px; font-weight:800; color:var(--purple-light); }
+.glosario-term .emoji { font-size:22px; }
+.glosario-def {
+  font-size:14px; color:var(--text2); margin-top:10px; line-height:1.6;
+  display:none;
+}
+.glosario-def.open { display:block; }
+.formula-box {
+  background:var(--bg3); border-radius:10px; padding:12px 16px;
+  margin-top:8px; font-family:monospace; font-size:15px;
+  color:var(--yellow); border-left:3px solid var(--orange);
+}
+.example-box {
+  background:rgba(16,185,129,0.1); border-radius:10px; padding:10px 14px;
+  margin-top:6px; font-size:13px; color:#6EE7B7; border-left:3px solid var(--green);
+}
+
+/* ══ SCREEN: JUGAR ══ */
+#nivel-select { min-height:100vh; padding:20px; max-width:700px; margin:0 auto; }
+.nivel-grid { display:flex; flex-direction:column; gap:14px; margin-top:8px; }
+.nivel-card {
+  background:var(--card); border:2px solid var(--border); border-radius:20px;
+  padding:22px; cursor:pointer; transition:all 0.25s;
+  display:flex; align-items:center; gap:20px;
+}
+.nivel-card:hover { transform:translateY(-4px); }
+.nivel-card.aprendiz:hover { border-color:var(--green); box-shadow:0 8px 30px rgba(16,185,129,0.2); }
+.nivel-card.medio:hover { border-color:var(--cyan); box-shadow:0 8px 30px rgba(6,182,212,0.2); }
+.nivel-card.avanzado:hover { border-color:var(--pink); box-shadow:0 8px 30px rgba(236,72,153,0.2); }
+.nivel-emoji { font-size:40px; }
+.nivel-info { flex:1; }
+.nivel-name { font-family:'Fredoka One','Comic Sans MS','Trebuchet MS',Arial,sans-serif; font-size:22px; margin-bottom:4px; }
+.nivel-desc { font-size:13px; color:var(--text2); font-weight:600; }
+.nivel-pts { font-size:12px; margin-top:6px; color:var(--yellow); font-weight:800; }
+.nivel-locked { opacity:0.4; cursor:not-allowed; }
+.nivel-lock-icon { font-size:24px; color:var(--text2); }
+
+/* ══ SCREEN: JUEGO ══ */
+#juego { min-height:100vh; padding:16px; max-width:700px; margin:0 auto; }
+.game-header {
+  display:grid; grid-template-columns:1fr auto 1fr;
+  align-items:center; padding:12px 0; margin-bottom:16px;
+}
+.pts-display {
+  font-family:'Fredoka One','Comic Sans MS','Trebuchet MS',Arial,sans-serif; font-size:22px;
+  color:var(--yellow); text-align:left;
+}
+.nivel-badge {
+  background:var(--bg3); border:1px solid var(--border);
+  padding:6px 16px; border-radius:50px;
+  font-size:13px; font-weight:800; color:var(--text2);
+  text-align:center;
+}
+.progress-bar {
+  background:var(--bg3); border-radius:10px; height:12px;
+  margin-bottom:20px; overflow:hidden;
+  border:1px solid var(--border);
+}
+.progress-fill {
+  height:100%; border-radius:10px;
+  background:linear-gradient(90deg,var(--purple),var(--pink));
+  transition:width 0.5s ease;
+  position:relative; overflow:hidden;
+}
+.progress-fill::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+  animation:shimmer 2s infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.progress-text {
+  text-align:right; font-size:12px; color:var(--text2); font-weight:700;
+  margin-top:-16px; margin-bottom:16px;
+}
+
+/* Figure canvas */
+.figure-canvas {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; padding:20px;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:16px; min-height:160px;
+}
+.figure-canvas svg { max-width:100%; }
+
+.question-card {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:16px; padding:18px 20px; margin-bottom:18px;
+}
+.question-label {
+  font-size:12px; color:var(--purple-light); font-weight:800;
+  text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;
+}
+.question-text { font-size:18px; font-weight:700; line-height:1.5; }
+
+.options-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  margin-bottom:16px;
+}
+.option-btn {
+  background:var(--card); border:2px solid var(--border);
+  color:var(--text); padding:14px 12px; border-radius:14px;
+  cursor:pointer; font-family:'Nunito','Trebuchet MS',Arial,sans-serif;
+  font-size:16px; font-weight:700; transition:all 0.2s;
+  text-align:center;
+}
+.option-btn:hover { border-color:var(--purple-light); background:var(--bg3); transform:scale(1.02); }
+.option-btn.correct { background:rgba(16,185,129,0.2); border-color:var(--green); color:#6EE7B7; animation:pop 0.3s; }
+.option-btn.wrong { background:rgba(239,68,68,0.2); border-color:var(--red); color:#FCA5A5; animation:shake 0.4s; }
+.option-btn:disabled { cursor:not-allowed; }
+
+@keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+.feedback-bar {
+  border-radius:14px; padding:14px 18px; margin-bottom:14px;
+  font-size:14px; font-weight:700; display:none; line-height:1.6;
+}
+.feedback-bar.correct { background:rgba(16,185,129,0.15); border:1px solid var(--green); color:#6EE7B7; display:block; }
+.feedback-bar.wrong { background:rgba(239,68,68,0.15); border:1px solid var(--red); color:#FCA5A5; display:block; }
+.feedback-formula { font-family:monospace; font-size:15px; color:var(--yellow); margin-top:6px; }
+
+.game-footer {
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.formula-toggle {
+  background:var(--bg3); border:1px solid var(--border); color:var(--text2);
+  padding:10px 16px; border-radius:50px; cursor:pointer;
+  font-family:'Nunito','Trebuchet MS',Arial,sans-serif; font-weight:700; font-size:13px;
+  transition:all 0.2s; flex:1; max-width:160px;
+}
+.formula-toggle:hover { border-color:var(--purple-light); color:var(--text); }
+.streak-display {
+  background:var(--bg3); border:1px solid rgba(245,158,11,0.3);
+  padding:8px 16px; border-radius:50px;
+  font-size:13px; font-weight:800; color:var(--orange);
+}
+
+/* Formula panel */
+.formula-panel {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:16px; padding:16px; margin-top:14px; display:none;
+}
+.formula-panel.open { display:block; }
+.formula-panel-title { font-size:14px; font-weight:800; color:var(--purple-light); margin-bottom:12px; }
+.formula-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:8px 0; border-bottom:1px solid var(--border); font-size:13px;
+}
+.formula-row:last-child { border-bottom:none; }
+.formula-row .fkey { color:var(--text2); font-weight:700; }
+.formula-row .fval { font-family:monospace; color:var(--yellow); font-weight:700; }
+
+/* ══ SCREEN: RESULTADO ══ */
+#resultado { min-height:100vh; padding:24px; max-width:600px; margin:0 auto; text-align:center; }
+.resultado-emoji { font-size:80px; margin:32px 0 16px; animation:bounce 1s ease infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+.resultado-title {
+  font-family:'Fredoka One','Comic Sans MS','Trebuchet MS',Arial,sans-serif; font-size:38px;
+  background:linear-gradient(135deg,var(--yellow),var(--orange),var(--pink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:8px;
+}
+.resultado-sub { font-size:16px; color:var(--text2); margin-bottom:32px; font-weight:600; }
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:32px; }
+.stat-card {
+  background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px;
+}
+.stat-val { font-family:'Fredoka One','Comic Sans MS','Trebuchet MS',Arial,sans-serif; font-size:36px; }
+.stat-label { font-size:12px; color:var(--text2); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-top:4px; }
+.trofeo-section { margin-bottom:32px; }
+.trofeo-title { font-size:14px; color:var(--text2); font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+.trofeos { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.trofeo {
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+  padding:12px 16px; font-size:13px; font-weight:800;
+  display:flex; align-items:center; gap:8px;
+}
+.trofeo.earned { border-color:var(--yellow); background:rgba(252,211,77,0.1); color:var(--yellow); }
+
+/* ══ TRANSITIONS ══ */
+.screen { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══ CELEBRACION OVERLAY ══ */
+#celebracion {
+  position:fixed; inset:0; z-index:100;
+  display:none; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
+  text-align:center; padding:24px;
+}
+#celebracion.show { display:flex; flex-direction:column; }
+.cel-emoji { font-size:80px; animation:bounceIn 0.5s; }
+.cel-title { font-family:'Fredoka One','Comic Sans MS','Trebuchet MS',Arial,sans-serif; font-size:40px; color:var(--yellow); margin:12px 0; }
+.cel-sub { font-size:16px; color:var(--text2); margin-bottom:24px; }
+@keyframes bounceIn { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+
+/* confetti */
+.confetti-piece {
+  position:fixed; width:10px; height:10px; border-radius:2px;
+  animation:confettiFall 2s ease-in forwards;
+  pointer-events:none; z-index:101;
+}
+@keyframes confettiFall {
+  0% { transform:translateY(-20px) rotate(0); opacity:1; }
+  100% { transform:translateY(100vh) rotate(720deg); opacity:0; }
+}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:480px) {
+  .options-grid { grid-template-columns:1fr; }
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .home-logo { font-size:56px; }
+}
+
+/* ══ MEJORA A: Badges de progreso guardado ══ */
+.home-saved-wrap {
+  display:none; margin-bottom:16px;
+  flex-wrap:wrap; gap:8px; justify-content:center;
+}
+.saved-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4);
+  color:#6EE7B7; padding:6px 14px; border-radius:50px;
+  font-size:13px; font-weight:700;
+}
+.nivel-done-badge {
+  display:none; font-size:11px; font-weight:800;
+  background:rgba(252,211,77,0.15); border:1px solid rgba(252,211,77,0.4);
+  color:var(--yellow); padding:2px 8px; border-radius:20px; margin-left:6px;
+}
+
+/* ══ MEJORA B: Botón siguiente grande + auto-avance ══ */
+.next-big-wrap {
+  display:none; flex-direction:column; align-items:stretch;
+  gap:8px; margin-bottom:14px;
+}
+.next-big-wrap.show { display:flex; }
+.next-big-btn {
+  width:100%; padding:16px; border-radius:16px; border:none;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  color:#fff; font-family:inherit; font-size:18px; font-weight:800;
+  cursor:pointer; letter-spacing:0.3px;
+  box-shadow:0 4px 24px rgba(124,58,237,0.5);
+  animation:pulse-next 1.8s ease-in-out infinite;
+}
+@keyframes pulse-next {
+  0%,100%{box-shadow:0 4px 20px rgba(124,58,237,0.4);}
+  50%{box-shadow:0 6px 32px rgba(236,72,153,0.65);}
+}
+.next-big-btn:hover { filter:brightness(1.1); transform:translateY(-2px); }
+.auto-bar-wrap { display:flex; align-items:center; gap:10px; }
+.auto-bar-track {
+  flex:1; height:5px; background:var(--bg3);
+  border-radius:3px; overflow:hidden;
+}
+.auto-bar-fill {
+  height:100%; border-radius:3px;
+  background:linear-gradient(90deg,var(--cyan),var(--purple));
+  width:100%; transition:width linear;
+}
+.auto-label { font-size:11px; color:var(--text2); font-weight:600; white-space:nowrap; }
+
+/* ══ MEJORA C: Contador de preguntas ══ */
+.progress-header {
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:5px;
+}
+.question-counter {
+  font-size:12px; font-weight:800; color:var(--purple-light);
+  background:var(--bg3); border:1px solid var(--border);
+  padding:3px 10px; border-radius:20px;
+}
+
+/* ══ Modal de salida (reemplaza confirm nativo) ══ */
+#exit-modal {
+  position:fixed; inset:0; z-index:200;
+  display:none; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.88); backdrop-filter:blur(6px); padding:24px;
+}
+#exit-modal.show { display:flex; }
+.exit-box {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:24px; padding:28px 22px;
+  max-width:320px; width:100%; text-align:center;
+}
+.exit-box-title { font-size:22px; font-weight:900; margin-bottom:6px; }
+.exit-box-sub { font-size:14px; color:var(--text2); margin-bottom:22px; line-height:1.6; }
+.exit-box-btns { display:flex; gap:10px; }
+.exit-box-btns button { flex:1; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ HOME ══════════════════ -->
+<div id="home" class="screen active">
+  <div class="home-logo">GeoMats</div>
+  <p class="home-sub">🔷 Aprende geometría jugando 🔷</p>
+  <div class="home-figures">
+    <div class="fig-icon">🔵</div>
+    <div class="fig-icon">🔺</div>
+    <div class="fig-icon">🟥</div>
+    <div class="fig-icon">🔶</div>
+    <div class="fig-icon">⬡</div>
+  </div>
+  <div id="home-saved-wrap" class="home-saved-wrap">
+    <span class="saved-badge">💾 Progreso guardado</span>
+  </div>
+  <div class="home-menu">
+    <button class="menu-btn" onclick="goTo('nivel-select')">
+      <span class="icon">🎮</span>
+      <div class="info">
+        <div class="title">¡A Jugar!</div>
+        <div class="desc">Elige tu nivel y consigue 1000 pts</div>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="goTo('glosario')">
+      <span class="icon">📐</span>
+      <div class="info">
+        <div class="title">Fórmulas</div>
+        <div class="desc">Consulta todas las fórmulas</div>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+    <button class="menu-btn" onclick="goTo('como-jugar')">
+      <span class="icon">❓</span>
+      <div class="info">
+        <div class="title">¿Cómo jugar?</div>
+        <div class="desc">Instrucciones rápidas</div>
+      </div>
+      <span class="arrow">›</span>
+    </button>
+  </div>
+  <!-- Privacy notice -->
+  <p style="font-size:11px;color:var(--text2);margin-top:20px;text-align:center;line-height:1.7;max-width:320px;">🔒 App 100% gratuita · Sin publicidad · Sin registro · Sin recogida de datos · Funciona sin internet · Apta para todas las edades</p>
+</div>
+
+<!-- ══════════════════ CÓMO JUGAR ══════════════════ -->
+<div id="como-jugar" class="screen" style="min-height:100vh;padding:20px;max-width:600px;margin:0 auto;">
+  <div class="screen-header">
+    <button class="back-btn" onclick="goTo('home')">← Atrás</button>
+    <span class="screen-title">❓ Cómo Jugar</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="card">
+      <div style="font-size:32px;margin-bottom:10px;">🎯</div>
+      <div style="font-size:17px;font-weight:800;color:var(--purple-light);margin-bottom:6px;">Objetivo</div>
+      <p style="font-size:14px;color:var(--text2);line-height:1.7;">Consigue <strong style="color:var(--yellow)">1.000 puntos</strong> para superar cada nivel. Elige entre 3 niveles de dificultad: Aprendiz, Medio y Avanzado.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:32px;margin-bottom:10px;">⚡</div>
+      <div style="font-size:17px;font-weight:800;color:var(--cyan);margin-bottom:6px;">Puntuación</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;">
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg3);border-radius:10px;">
+          <span>✅ Correcto al 1er intento</span><strong style="color:var(--green)">+10 pts</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg3);border-radius:10px;">
+          <span>🔄 Correcto al 2º intento</span><strong style="color:var(--cyan)">+5 pts</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg3);border-radius:10px;">
+          <span>❌ Respuesta incorrecta</span><strong style="color:var(--red)">−2 pts</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;">
+          <span>🔥 Racha de 5 seguidas</span><strong style="color:var(--orange)">+20 pts bonus</strong>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:32px;margin-bottom:10px;">💡</div>
+      <div style="font-size:17px;font-weight:800;color:var(--orange);margin-bottom:6px;">Trucos</div>
+      <ul style="font-size:14px;color:var(--text2);line-height:2;padding-left:18px;">
+        <li>Pulsa <strong style="color:var(--text)">Ver Fórmulas</strong> si necesitas ayuda</li>
+        <li>Cuando fallas, la app te explica la solución</li>
+        <li>Las fórmulas se muestran en la pantalla de juego</li>
+        <li>¡Funciona sin internet! 📵</li>
+      </ul>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:24px;">
+    <button class="btn btn-primary" onclick="goTo('nivel-select')">🎮 ¡Empezar a Jugar!</button>
+  </div>
+</div>
+
+<!-- ══════════════════ GLOSARIO ══════════════════ -->
+<div id="glosario" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="goTo('home')">← Atrás</button>
+    <span class="screen-title">📐 Fórmulas</span>
+  </div>
+  <div class="glosario-grid" id="glosario-grid"></div>
+  <div style="height:32px;"></div>
+</div>
+
+<!-- ══════════════════ NIVEL SELECT ══════════════════ -->
+<div id="nivel-select" class="screen">
+  <div style="padding:20px;max-width:600px;margin:0 auto;">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goTo('home')">← Atrás</button>
+      <span class="screen-title">🎮 Elige Nivel</span>
+    </div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:20px;font-weight:600;">Necesitas <strong style="color:var(--yellow)">1.000 puntos</strong> para superar cada nivel.</p>
+    <div class="nivel-grid">
+      <div class="nivel-card aprendiz" onclick="startGame('aprendiz')">
+        <span class="nivel-emoji">🌱</span>
+        <div class="nivel-info">
+          <div class="nivel-name" style="color:var(--green)">Aprendiz <span class="nivel-done-badge" id="done-aprendiz">✅ Completado</span></div>
+          <div class="nivel-desc">Figuras básicas · Con ayuda de fórmulas · 4 opciones</div>
+          <div class="nivel-pts">⭐ Cuadrado, Rectángulo, Triángulo, Círculo</div>
+        </div>
+      </div>
+      <div class="nivel-card medio" onclick="startGame('medio')">
+        <span class="nivel-emoji">🚀</span>
+        <div class="nivel-info">
+          <div class="nivel-name" style="color:var(--cyan)">Medio <span class="nivel-done-badge" id="done-medio">✅ Completado</span></div>
+          <div class="nivel-desc">Todas las figuras planas · Sin ayuda visual · Más cálculo</div>
+          <div class="nivel-pts">⭐⭐ Rombo, Trapecio, Pentágono, Hexágono</div>
+        </div>
+      </div>
+      <div class="nivel-card avanzado" onclick="startGame('avanzado')">
+        <span class="nivel-emoji">🔥</span>
+        <div class="nivel-info">
+          <div class="nivel-name" style="color:var(--pink)">Avanzado <span class="nivel-done-badge" id="done-avanzado">✅ Completado</span></div>
+          <div class="nivel-desc">Cuerpos 3D · Problemas contextualizados · Cronómetro</div>
+          <div class="nivel-pts">⭐⭐⭐ Cubo, Cilindro, Esfera, Cono, Pirámide</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ JUEGO ══════════════════ -->
+<div id="juego" class="screen">
+  <div class="game-header">
+    <div class="pts-display">⭐ <span id="pts-num">0</span></div>
+    <div class="nivel-badge" id="nivel-badge">Aprendiz</div>
+    <button class="back-btn" style="text-align:right;float:right;" onclick="confirmExit()">✕ Salir</button>
+  </div>
+  <!-- MEJORA C: contador de preguntas + barra de puntos -->
+  <div class="progress-header">
+    <span class="question-counter" id="question-counter">Pregunta 1 de 10</span>
+    <span style="font-size:12px;color:var(--text2);font-weight:700;" id="progress-text">0 / 1000 pts</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="figure-canvas" id="figure-canvas"></div>
+  <div class="question-card">
+    <div class="question-label">🤔 Pregunta</div>
+    <div class="question-text" id="question-text">Cargando...</div>
+  </div>
+  <div class="options-grid" id="options-grid"></div>
+  <!-- Modo escritura libre -->
+  <div id="input-mode" style="display:none;margin-bottom:16px;">
+    <div style="font-size:13px;color:var(--purple-light);font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">✏️ Escribe tu respuesta</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <input id="free-input" type="number" step="0.01" placeholder="Escribe el resultado..." style="flex:1;background:var(--card);border:2px solid var(--border);color:var(--text);padding:14px 16px;border-radius:14px;font-size:18px;font-weight:700;outline:none;transition:border-color 0.2s;" onkeydown="if(event.key==='Enter')checkFreeInput()" onfocus="this.style.borderColor='var(--purple-light)'" onblur="this.style.borderColor='var(--border)'"/>
+      <button class="btn btn-primary" onclick="checkFreeInput()" style="padding:14px 20px;font-size:15px;">✓ OK</button>
+    </div>
+    <div style="font-size:12px;color:var(--text2);margin-top:8px;">💡 Redondea a 2 decimales si es necesario</div>
+  </div>
+  <div class="feedback-bar" id="feedback-bar"></div>
+  <!-- MEJORA B: Botón siguiente grande con auto-avance -->
+  <div class="next-big-wrap" id="next-big-wrap">
+    <button class="next-big-btn" onclick="nextQuestion()">Siguiente pregunta →</button>
+    <div class="auto-bar-wrap">
+      <div class="auto-bar-track"><div class="auto-bar-fill" id="auto-fill"></div></div>
+      <span class="auto-label" id="auto-label">Avanza solo en 3s</span>
+    </div>
+  </div>
+  <div class="game-footer">
+    <button class="formula-toggle" onclick="toggleFormulas()">📋 Ver Fórmulas</button>
+    <div class="streak-display" id="streak-display">🔥 Racha: 0</div>
+  </div>
+  <div class="formula-panel" id="formula-panel">
+    <div class="formula-panel-title">📐 Fórmulas del nivel</div>
+    <div id="formula-list"></div>
+  </div>
+  <div style="height:32px;"></div>
+</div>
+
+<!-- ══════════════════ RESULTADO ══════════════════ -->
+<div id="resultado" class="screen">
+  <div id="res-emoji" class="resultado-emoji">🏆</div>
+  <div class="resultado-title" id="res-title">¡NIVEL SUPERADO!</div>
+  <div class="resultado-sub" id="res-sub">¡Has conseguido 1.000 puntos!</div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val" id="stat-pts" style="color:var(--yellow)">0</div><div class="stat-label">Puntos</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-correctas" style="color:var(--green)">0</div><div class="stat-label">✅ Correctas</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-fallos" style="color:var(--red)">0</div><div class="stat-label">❌ Fallos</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-racha" style="color:var(--orange)">0</div><div class="stat-label">🔥 Mejor racha</div></div>
+  </div>
+  <div class="trofeo-section">
+    <div class="trofeo-title">🏅 Tus Logros</div>
+    <div class="trofeos" id="trofeos"></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px;align-items:center;">
+    <button class="btn btn-primary" onclick="goTo('nivel-select')">🎮 Jugar de nuevo</button>
+    <button class="btn btn-secondary" onclick="goTo('home')">🏠 Inicio</button>
+  </div>
+</div>
+
+<!-- ══════════════════ CELEBRACIÓN ══════════════════ -->
+<div id="celebracion">
+  <div class="cel-emoji" id="cel-emoji">🎉</div>
+  <div class="cel-title" id="cel-title">¡Genial!</div>
+  <div class="cel-sub" id="cel-sub">Sigue así</div>
+  <button class="btn btn-primary" onclick="closeCelebracion()">¡Continuar!</button>
+</div>
+
+<!-- ══ Modal de salida ══ -->
+<div id="exit-modal">
+  <div class="exit-box">
+    <div class="exit-box-title">⚠️ ¿Salir?</div>
+    <div class="exit-box-sub">Perderás el progreso de esta partida.<br>¿Seguro que quieres salir?</div>
+    <div class="exit-box-btns">
+      <button class="btn btn-secondary" onclick="closeExitModal()" style="font-size:14px;padding:12px;">Quedarme</button>
+      <button class="btn btn-primary" onclick="doExit()" style="font-size:14px;padding:12px;">Salir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════
+
+const GLOSARIO = [
+  {
+    name:"Cuadrado", emoji:"🟥",
+    def:"Polígono de 4 lados iguales y 4 ángulos rectos (90°). Todos sus lados miden lo mismo.",
+    formulas:[
+      {k:"Perímetro",v:"P = 4 × l"},
+      {k:"Área",v:"A = l²"}
+    ],
+    ejemplo:"Si l = 5 cm → P = 20 cm, A = 25 cm²"
+  },
+  {
+    name:"Rectángulo", emoji:"▬",
+    def:"Polígono de 4 lados con 4 ángulos rectos. Los lados opuestos son iguales.",
+    formulas:[
+      {k:"Perímetro",v:"P = 2 × (b + h)"},
+      {k:"Área",v:"A = b × h"}
+    ],
+    ejemplo:"Si b = 8, h = 3 → P = 22 cm, A = 24 cm²"
+  },
+  {
+    name:"Triángulo", emoji:"🔺",
+    def:"Polígono de 3 lados. La suma de sus ángulos siempre es 180°.",
+    formulas:[
+      {k:"Perímetro",v:"P = a + b + c"},
+      {k:"Área",v:"A = (b × h) / 2"}
+    ],
+    ejemplo:"Si b = 6, h = 4 → A = 12 cm²"
+  },
+  {
+    name:"Círculo", emoji:"🔵",
+    def:"Figura plana donde todos los puntos están a la misma distancia (radio) del centro. π ≈ 3,1416",
+    formulas:[
+      {k:"Circunferencia",v:"L = 2 × π × r"},
+      {k:"Área",v:"A = π × r²"}
+    ],
+    ejemplo:"Si r = 3 → L ≈ 18,85 cm, A ≈ 28,27 cm²"
+  },
+  {
+    name:"Rombo", emoji:"🔷",
+    def:"Polígono de 4 lados iguales. Sus ángulos opuestos son iguales pero no rectos.",
+    formulas:[
+      {k:"Perímetro",v:"P = 4 × l"},
+      {k:"Área",v:"A = (D × d) / 2"}
+    ],
+    ejemplo:"Si D = 10, d = 6 → A = 30 cm²"
+  },
+  {
+    name:"Trapecio", emoji:"⏢",
+    def:"Polígono de 4 lados donde exactamente un par de lados es paralelo (base mayor B y base menor b).",
+    formulas:[
+      {k:"Perímetro",v:"P = a + b + c + d"},
+      {k:"Área",v:"A = ((B + b) × h) / 2"}
+    ],
+    ejemplo:"Si B=10, b=6, h=4 → A = 32 cm²"
+  },
+  {
+    name:"Hexágono Regular", emoji:"⬡",
+    def:"Polígono de 6 lados y 6 ángulos iguales (120° cada uno). Como los panales de abejas.",
+    formulas:[
+      {k:"Perímetro",v:"P = 6 × l"},
+      {k:"Área",v:"A = (3 × √3 × l²) / 2"}
+    ],
+    ejemplo:"Si l = 4 → P = 24 cm, A ≈ 41,57 cm²"
+  },
+  {
+    name:"Cubo", emoji:"🎲",
+    def:"Sólido 3D con 6 caras cuadradas iguales, 12 aristas iguales y 8 vértices.",
+    formulas:[
+      {k:"Área total",v:"A = 6 × l²"},
+      {k:"Volumen",v:"V = l³"}
+    ],
+    ejemplo:"Si l = 3 → A = 54 cm², V = 27 cm³"
+  },
+  {
+    name:"Cilindro", emoji:"🥫",
+    def:"Sólido con dos bases circulares paralelas unidas por una superficie lateral curva.",
+    formulas:[
+      {k:"Área total",v:"A = 2 × π × r × (r + h)"},
+      {k:"Volumen",v:"V = π × r² × h"}
+    ],
+    ejemplo:"Si r=3, h=7 → V ≈ 197,92 cm³"
+  },
+  {
+    name:"Esfera", emoji:"🌐",
+    def:"Sólido donde todos los puntos de la superficie están a la misma distancia del centro (radio r).",
+    formulas:[
+      {k:"Área total",v:"A = 4 × π × r²"},
+      {k:"Volumen",v:"V = (4/3) × π × r³"}
+    ],
+    ejemplo:"Si r = 5 → V ≈ 523,33 cm³"
+  }
+];
+
+// ── PREGUNTAS ──────────────────────────────────────────────────────────────
+const PREGUNTAS = {
+  aprendiz: [
+    { figura:'cuadrado', pregunta:'¿Cuánto mide el perímetro de un cuadrado con lado = 4 cm?', opciones:['12 cm','16 cm','8 cm','20 cm'], correcta:1, feedback:'P = 4 × l = 4 × 4 = 16 cm', formula:'P = 4 × l', svg:'cuadrado', datos:{l:4} },
+    { figura:'cuadrado', pregunta:'¿Cuánto mide el ÁREA de un cuadrado con lado = 5 cm?', opciones:['20 cm²','10 cm²','25 cm²','15 cm²'], correcta:2, feedback:'A = l² = 5² = 25 cm²', formula:'A = l²', svg:'cuadrado', datos:{l:5} },
+    { figura:'rectángulo', pregunta:'Rectángulo con base = 6 cm y altura = 3 cm. Escribe su ÁREA en cm² (solo el número):', opciones:['18 cm²','9 cm²','36 cm²','12 cm²'], correcta:0, tipo:'input', correctaVal:18, feedback:'A = b × h = 6 × 3 = 18 cm²', formula:'A = b × h', svg:'rectangulo', datos:{b:6,h:3} },
+    { figura:'rectángulo', pregunta:'Rectángulo con base = 8 cm y altura = 2 cm. ¿Cuál es su perímetro?', opciones:['16 cm','10 cm','20 cm','32 cm'], correcta:2, feedback:'P = 2 × (b + h) = 2 × (8+2) = 20 cm', formula:'P = 2(b+h)', svg:'rectangulo', datos:{b:8,h:2} },
+    { figura:'triángulo', pregunta:'Triángulo con base = 6 cm y altura = 4 cm. ¿Cuál es su área?', opciones:['24 cm²','12 cm²','10 cm²','8 cm²'], correcta:1, feedback:'A = (b × h)/2 = (6×4)/2 = 12 cm²', formula:'A = (b×h)/2', svg:'triangulo', datos:{b:6,h:4} },
+    { figura:'triángulo', pregunta:'Triángulo con lados 3, 4 y 5 cm. ¿Cuál es su perímetro?', opciones:['10 cm','12 cm','9 cm','14 cm'], correcta:1, feedback:'P = a+b+c = 3+4+5 = 12 cm', formula:'P = a+b+c', svg:'triangulo', datos:{a:3,b:4,c:5} },
+    { figura:'círculo', pregunta:'Círculo con radio = 2 cm. ¿Cuánto vale π × r²? (π ≈ 3,14)', opciones:['6,28 cm²','12,56 cm²','3,14 cm²','25,12 cm²'], correcta:1, feedback:'A = π × r² = 3,14 × 4 ≈ 12,56 cm²', formula:'A = π × r²', svg:'circulo', datos:{r:2} },
+    { figura:'círculo', pregunta:'Círculo con radio = 3 cm. ¿Cuánto mide su circunferencia? (π ≈ 3,14)', opciones:['9,42 cm','18,84 cm','28,26 cm','6,28 cm'], correcta:1, feedback:'L = 2 × π × r = 2 × 3,14 × 3 ≈ 18,84 cm', formula:'L = 2 × π × r', svg:'circulo', datos:{r:3} },
+    { figura:'cuadrado', pregunta:'¿Qué fórmula calcula el ÁREA del cuadrado?', opciones:['A = 4 × l','A = l²','A = b × h','A = l + l'], correcta:1, feedback:'El área del cuadrado es el lado multiplicado por sí mismo: A = l²', formula:'A = l²', svg:'cuadrado', datos:{l:4} },
+    { figura:'rectángulo', pregunta:'Un rectángulo tiene área = 20 cm² y base = 5 cm. ¿Cuánto mide su altura?', opciones:['15 cm','4 cm','10 cm','25 cm'], correcta:1, feedback:'A = b×h → h = A/b = 20/5 = 4 cm', formula:'h = A / b', svg:'rectangulo', datos:{b:5,h:4} },
+  ],
+  medio: [
+    { figura:'rombo', pregunta:'Rombo con diagonales D = 12 cm y d = 8 cm. ¿Cuál es su área?', opciones:['96 cm²','48 cm²','24 cm²','80 cm²'], correcta:1, feedback:'A = (D × d)/2 = (12×8)/2 = 48 cm²', formula:'A = (D×d)/2', svg:'rombo', datos:{D:12,d:8} },
+    { figura:'rombo', pregunta:'Rombo con lado = 7 cm. ¿Cuál es su perímetro?', opciones:['14 cm','21 cm','28 cm','35 cm'], correcta:2, feedback:'P = 4 × l = 4 × 7 = 28 cm', formula:'P = 4 × l', svg:'rombo', datos:{l:7} },
+    { figura:'trapecio', pregunta:'Trapecio con B = 10, b = 6 y h = 5 cm. ¿Cuál es su área?', opciones:['80 cm²','40 cm²','50 cm²','30 cm²'], correcta:1, feedback:'A = ((B+b)×h)/2 = ((10+6)×5)/2 = 40 cm²', formula:'A = ((B+b)×h)/2', svg:'trapecio', datos:{B:10,b:6,h:5} },
+    { figura:'hexágono', pregunta:'Hexágono regular con lado = 6 cm. Escribe su PERÍMETRO en cm (solo el número):', opciones:['30 cm','36 cm','42 cm','24 cm'], correcta:1, tipo:'input', correctaVal:36, feedback:'P = 6 × l = 6 × 6 = 36 cm', formula:'P = 6 × l', svg:'hexagono', datos:{l:6} },
+    { figura:'triángulo', pregunta:'¿Cuántos grados suman los ángulos interiores de un triángulo?', opciones:['90°','270°','180°','360°'], correcta:2, feedback:'La suma de los ángulos interiores de cualquier triángulo es siempre 180°', formula:'Suma = 180°', svg:'triangulo', datos:{b:6,h:4} },
+    { figura:'círculo', pregunta:'Círculo con diámetro = 10 cm. ¿Cuánto mide su radio?', opciones:['20 cm','10 cm','5 cm','3,14 cm'], correcta:2, feedback:'El radio es la mitad del diámetro: r = d/2 = 10/2 = 5 cm', formula:'r = d / 2', svg:'circulo', datos:{r:5} },
+    { figura:'cuadrado', pregunta:'Un cuadrado tiene área = 49 cm². ¿Cuánto mide su lado?', opciones:['6 cm','7 cm','8 cm','9 cm'], correcta:1, feedback:'A = l² → l = √A = √49 = 7 cm', formula:'l = √A', svg:'cuadrado', datos:{l:7} },
+    { figura:'trapecio', pregunta:'Trapecio con B = 8, b = 4 y h = 6 cm. ¿Cuál es su área?', opciones:['48 cm²','36 cm²','24 cm²','72 cm²'], correcta:1, feedback:'A = ((B+b)×h)/2 = ((8+4)×6)/2 = 36 cm²', formula:'A = ((B+b)×h)/2', svg:'trapecio', datos:{B:8,b:4,h:6} },
+    { figura:'polígono', pregunta:'¿Cuántos grados suman los ángulos de un hexágono (6 lados)?', opciones:['540°','720°','360°','900°'], correcta:1, feedback:'Suma = (n−2)×180 = (6−2)×180 = 4×180 = 720°', formula:'Suma = (n−2)×180°', svg:'hexagono', datos:{l:5} },
+    { figura:'círculo', pregunta:'Círculo con radio = 4 cm. ¿Cuál es su área? (π ≈ 3,14)', opciones:['12,56 cm²','25,12 cm²','50,24 cm²','100,48 cm²'], correcta:2, feedback:'A = π × r² = 3,14 × 16 ≈ 50,24 cm²', formula:'A = π × r²', svg:'circulo', datos:{r:4} },
+  ],
+  avanzado: [
+    { figura:'cubo', pregunta:'Un cubo con arista = 4 cm. Escribe su VOLUMEN en cm³ (solo el número):', opciones:['16 cm³','24 cm³','64 cm³','48 cm³'], correcta:2, tipo:'input', correctaVal:64, feedback:'V = l³ = 4³ = 64 cm³', formula:'V = l³', svg:'cubo', datos:{l:4} },
+    { figura:'cubo', pregunta:'Un cubo con arista = 3 cm. ¿Cuál es su área total?', opciones:['18 cm²','27 cm²','54 cm²','36 cm²'], correcta:2, feedback:'A = 6 × l² = 6 × 9 = 54 cm²', formula:'A = 6 × l²', svg:'cubo', datos:{l:3} },
+    { figura:'cilindro', pregunta:'Una lata (cilindro) con radio = 3 cm y altura = 7 cm. ¿Cuál es su volumen? (π ≈ 3,14)', opciones:['65,94 cm³','131,88 cm³','197,82 cm³','263,76 cm³'], correcta:2, feedback:'V = π×r²×h = 3,14×9×7 ≈ 197,82 cm³', formula:'V = π × r² × h', svg:'cilindro', datos:{r:3,h:7} },
+    { figura:'esfera', pregunta:'Una pelota (esfera) con radio = 3 cm. ¿Cuánto mide su volumen? (π ≈ 3,14)', opciones:['28,26 cm³','56,52 cm³','113,04 cm³','226,08 cm³'], correcta:2, feedback:'V = (4/3)×π×r³ = (4/3)×3,14×27 ≈ 113,04 cm³', formula:'V = (4/3)×π×r³', svg:'esfera', datos:{r:3} },
+    { figura:'cono', pregunta:'Un cono con radio = 3 cm y altura = 4 cm. ¿Cuál es su volumen? (π ≈ 3,14)', opciones:['12,56 cm³','37,68 cm³','75,36 cm³','25,12 cm³'], correcta:1, feedback:'V = (π×r²×h)/3 = (3,14×9×4)/3 ≈ 37,68 cm³', formula:'V = (π×r²×h)/3', svg:'cono', datos:{r:3,h:4} },
+    { figura:'cubo', pregunta:'Un cubo tiene volumen = 125 cm³. ¿Cuánto mide su arista?', opciones:['4 cm','5 cm','6 cm','7 cm'], correcta:1, feedback:'V = l³ → l = ∛V = ∛125 = 5 cm', formula:'l = ∛V', svg:'cubo', datos:{l:5} },
+    { figura:'cilindro', pregunta:'Cilindro con radio = 2 cm y altura = 5 cm. ¿Cuál es su volumen? (π ≈ 3,14)', opciones:['31,4 cm³','62,8 cm³','94,2 cm³','125,6 cm³'], correcta:1, feedback:'V = π×r²×h = 3,14×4×5 = 62,8 cm³', formula:'V = π × r² × h', svg:'cilindro', datos:{r:2,h:5} },
+    { figura:'esfera', pregunta:'Una esfera tiene radio = 6 cm. ¿Cuál es su área total? (π ≈ 3,14)', opciones:['75,36 cm²','150,72 cm²','452,16 cm²','226,08 cm²'], correcta:2, feedback:'A = 4×π×r² = 4×3,14×36 ≈ 452,16 cm²', formula:'A = 4 × π × r²', svg:'esfera', datos:{r:6} },
+    { figura:'mixto', pregunta:'Un paralelepípedo (caja) de 5×3×2 cm. ¿Cuál es su volumen?', opciones:['16 cm³','20 cm³','30 cm³','10 cm³'], correcta:2, feedback:'V = l×a×h = 5×3×2 = 30 cm³', formula:'V = l × a × h', svg:'cubo', datos:{l:5} },
+    { figura:'cono', pregunta:'Un helado (cono) con radio = 4 cm y altura = 9 cm. ¿Cuánto cabe dentro? (π ≈ 3,14)', opciones:['75,36 cm³','150,72 cm³','301,44 cm³','50,24 cm³'], correcta:1, feedback:'V = (π×r²×h)/3 = (3,14×16×9)/3 ≈ 150,72 cm³', formula:'V = (π×r²×h)/3', svg:'cono', datos:{r:4,h:9} },
+  ]
+};
+
+const FORMULAS_NIVEL = {
+  aprendiz: [
+    {k:'Cuadrado — Perímetro', v:'P = 4 × l'},
+    {k:'Cuadrado — Área', v:'A = l²'},
+    {k:'Rectángulo — Perímetro', v:'P = 2 × (b + h)'},
+    {k:'Rectángulo — Área', v:'A = b × h'},
+    {k:'Triángulo — Perímetro', v:'P = a + b + c'},
+    {k:'Triángulo — Área', v:'A = (b × h) / 2'},
+    {k:'Círculo — Circunferencia', v:'L = 2 × π × r'},
+    {k:'Círculo — Área', v:'A = π × r²'},
+  ],
+  medio: [
+    {k:'Rombo — Perímetro', v:'P = 4 × l'},
+    {k:'Rombo — Área', v:'A = (D × d) / 2'},
+    {k:'Trapecio — Área', v:'A = ((B+b) × h) / 2'},
+    {k:'Hexágono — Perímetro', v:'P = 6 × l'},
+    {k:'Polígono — Ángulos', v:'Suma = (n−2) × 180°'},
+    {k:'Círculo — Área', v:'A = π × r²'},
+  ],
+  avanzado: [
+    {k:'Cubo — Área', v:'A = 6 × l²'},
+    {k:'Cubo — Volumen', v:'V = l³'},
+    {k:'Cilindro — Volumen', v:'V = π × r² × h'},
+    {k:'Esfera — Área', v:'A = 4 × π × r²'},
+    {k:'Esfera — Volumen', v:'V = (4/3) × π × r³'},
+    {k:'Cono — Volumen', v:'V = (π × r² × h) / 3'},
+  ]
+};
+
+// ── SVGs ──────────────────────────────────────────────────────────────────
+function getSVG(type, datos) {
+  const d = datos || {};
+  const svgs = {
+    cuadrado: `<svg viewBox="0 0 200 160" width="180"><rect x="40" y="20" width="120" height="120" fill="none" stroke="#A78BFA" stroke-width="3" rx="4"/>
+      <text x="100" y="180" text-anchor="middle" fill="#C4B5FD" font-size="13" font-family="Nunito">l = ${d.l||'?'} cm</text>
+      <text x="100" y="80" text-anchor="middle" fill="#7C3AED" font-size="28">▪</text></svg>`,
+    rectangulo: `<svg viewBox="0 0 220 160" width="200"><rect x="20" y="30" width="180" height="100" fill="none" stroke="#06B6D4" stroke-width="3" rx="4"/>
+      <text x="110" y="150" text-anchor="middle" fill="#67E8F9" font-size="13" font-family="Nunito">b = ${d.b||'?'} cm</text>
+      <text x="8" y="85" text-anchor="middle" fill="#67E8F9" font-size="13" font-family="Nunito">h=${d.h||'?'}</text></svg>`,
+    triangulo: `<svg viewBox="0 0 200 160" width="180"><polygon points="100,10 10,150 190,150" fill="none" stroke="#F59E0B" stroke-width="3"/>
+      <text x="100" y="172" text-anchor="middle" fill="#FCD34D" font-size="13" font-family="Nunito">b = ${d.b||'?'} cm</text></svg>`,
+    circulo: `<svg viewBox="0 0 200 160" width="180"><circle cx="100" cy="80" r="65" fill="none" stroke="#EC4899" stroke-width="3"/>
+      <line x1="100" y1="80" x2="165" y2="80" stroke="#F9A8D4" stroke-width="2" stroke-dasharray="5,3"/>
+      <text x="132" y="72" text-anchor="middle" fill="#F9A8D4" font-size="13" font-family="Nunito">r=${d.r||'?'}</text></svg>`,
+    rombo: `<svg viewBox="0 0 200 160" width="180"><polygon points="100,10 190,80 100,150 10,80" fill="none" stroke="#A78BFA" stroke-width="3"/>
+      <line x1="10" y1="80" x2="190" y2="80" stroke="#6D28D9" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <line x1="100" y1="10" x2="100" y2="150" stroke="#6D28D9" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="100" y="175" text-anchor="middle" fill="#C4B5FD" font-size="12" font-family="Nunito">D=${d.D||'?'} · d=${d.d||'?'}</text></svg>`,
+    trapecio: `<svg viewBox="0 0 220 160" width="200"><polygon points="50,20 170,20 200,140 20,140" fill="none" stroke="#10B981" stroke-width="3"/>
+      <text x="110" y="160" text-anchor="middle" fill="#6EE7B7" font-size="12" font-family="Nunito">B=${d.B||'?'} b=${d.b||'?'} h=${d.h||'?'}</text></svg>`,
+    hexagono: `<svg viewBox="0 0 200 180" width="180"><polygon points="100,10 180,55 180,125 100,170 20,125 20,55" fill="none" stroke="#F59E0B" stroke-width="3"/>
+      <text x="100" y="190" text-anchor="middle" fill="#FCD34D" font-size="13" font-family="Nunito">l = ${d.l||'?'} cm</text></svg>`,
+    cubo: `<svg viewBox="0 0 200 170" width="180">
+      <polygon points="40,50 140,50 140,150 40,150" fill="none" stroke="#A78BFA" stroke-width="2.5"/>
+      <polygon points="40,50 80,20 180,20 140,50" fill="none" stroke="#A78BFA" stroke-width="2.5"/>
+      <polygon points="140,50 180,20 180,120 140,150" fill="none" stroke="#A78BFA" stroke-width="2.5"/>
+      <text x="90" y="168" text-anchor="middle" fill="#C4B5FD" font-size="13" font-family="Nunito">l = ${d.l||'?'} cm</text></svg>`,
+    cilindro: `<svg viewBox="0 0 200 180" width="180">
+      <ellipse cx="100" cy="40" rx="70" ry="22" fill="none" stroke="#06B6D4" stroke-width="2.5"/>
+      <line x1="30" y1="40" x2="30" y2="140" stroke="#06B6D4" stroke-width="2.5"/>
+      <line x1="170" y1="40" x2="170" y2="140" stroke="#06B6D4" stroke-width="2.5"/>
+      <ellipse cx="100" cy="140" rx="70" ry="22" fill="none" stroke="#06B6D4" stroke-width="2.5"/>
+      <text x="100" y="178" text-anchor="middle" fill="#67E8F9" font-size="12" font-family="Nunito">r=${d.r||'?'} h=${d.h||'?'}</text></svg>`,
+    esfera: `<svg viewBox="0 0 200 200" width="180">
+      <circle cx="100" cy="100" r="80" fill="none" stroke="#EC4899" stroke-width="2.5"/>
+      <ellipse cx="100" cy="100" rx="80" ry="25" fill="none" stroke="#F9A8D4" stroke-width="1.5" stroke-dasharray="5,4"/>
+      <line x1="100" y1="100" x2="180" y2="100" stroke="#F9A8D4" stroke-width="2" stroke-dasharray="4,3"/>
+      <text x="140" y="92" fill="#F9A8D4" font-size="13" font-family="Nunito">r=${d.r||'?'}</text></svg>`,
+    cono: `<svg viewBox="0 0 200 190" width="180">
+      <line x1="100" y1="10" x2="20" y2="160" stroke="#F59E0B" stroke-width="2.5"/>
+      <line x1="100" y1="10" x2="180" y2="160" stroke="#F59E0B" stroke-width="2.5"/>
+      <ellipse cx="100" cy="160" rx="80" ry="20" fill="none" stroke="#F59E0B" stroke-width="2.5"/>
+      <text x="100" y="188" text-anchor="middle" fill="#FCD34D" font-size="12" font-family="Nunito">r=${d.r||'?'} h=${d.h||'?'}</text></svg>`,
+  };
+  return svgs[type] || svgs['cuadrado'];
+}
+
+// ══════════════════════════════════════════════════
+//  MEJORA A — PERSISTENCIA localStorage
+// ══════════════════════════════════════════════════
+const SAVE_KEY = 'geomats_v3';
+function saveCompleted(nivel) {
+  try {
+    const d = JSON.parse(localStorage.getItem(SAVE_KEY)||'{}');
+    if(!d.done) d.done = [];
+    if(!d.done.includes(nivel)) d.done.push(nivel);
+    localStorage.setItem(SAVE_KEY, JSON.stringify(d));
+  } catch(e){}
+}
+function getCompleted() {
+  try { return JSON.parse(localStorage.getItem(SAVE_KEY)||'{}').done || []; } catch(e){ return []; }
+}
+
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+let state = {
+  nivel:'aprendiz', pts:0, correctas:0, fallos:0,
+  streak:0, bestStreak:0, qIndex:0,
+  answered:false, firstTry:true, questions:[],
+  milestoneShown:[], currentQ:null
+};
+let autoTimer = null;
+
+// ══════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id === 'home' || id === 'nivel-select') refreshSavedUI();
+}
+
+function refreshSavedUI() {
+  const done = getCompleted();
+  // home badge
+  const wrap = document.getElementById('home-saved-wrap');
+  if(wrap) wrap.style.display = done.length > 0 ? 'flex' : 'none';
+  // nivel badges
+  ['aprendiz','medio','avanzado'].forEach(n => {
+    const el = document.getElementById(`done-${n}`);
+    if(el) el.style.display = done.includes(n) ? 'inline' : 'none';
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  GLOSARIO BUILD
+// ══════════════════════════════════════════════════
+function buildGlosario() {
+  const grid = document.getElementById('glosario-grid');
+  grid.innerHTML = '';
+  GLOSARIO.forEach((item,i) => {
+    const div = document.createElement('div');
+    div.className = 'glosario-item';
+    const formulasHTML = item.formulas.map(f =>
+      `<div class="formula-row"><span class="fkey">${f.k}</span><span class="fval">${f.v}</span></div>`
+    ).join('');
+    div.innerHTML = `
+      <div class="glosario-term">
+        <span class="name">${item.emoji} ${item.name}</span>
+        <span style="color:var(--text2);font-size:18px;" id="arr-${i}">›</span>
+      </div>
+      <div class="glosario-def" id="def-${i}">
+        <p style="margin-bottom:10px;line-height:1.7;">${item.def}</p>
+        <div class="formula-box">${formulasHTML}</div>
+        <div class="example-box">📝 ${item.ejemplo}</div>
+      </div>`;
+    div.onclick = () => {
+      const def = document.getElementById(`def-${i}`);
+      const arr = document.getElementById(`arr-${i}`);
+      def.classList.toggle('open');
+      arr.textContent = def.classList.contains('open') ? '⌄' : '›';
+    };
+    grid.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  GAME START
+// ══════════════════════════════════════════════════
+function startGame(nivel) {
+  state = {
+    nivel, pts:0, correctas:0, fallos:0,
+    streak:0, bestStreak:0, qIndex:0,
+    answered:false, firstTry:true,
+    questions: shuffle([...PREGUNTAS[nivel]]),
+    milestoneShown:[]
+  };
+  document.getElementById('nivel-badge').textContent =
+    nivel==='aprendiz'?'🌱 Aprendiz': nivel==='medio'?'🚀 Medio':'🔥 Avanzado';
+  buildFormulaPanel(nivel);
+  goTo('juego');
+  renderQuestion();
+}
+
+function shuffle(arr) {
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// ══════════════════════════════════════════════════
+//  RENDER QUESTION
+// ══════════════════════════════════════════════════
+function renderQuestion() {
+  if(autoTimer){ clearTimeout(autoTimer); autoTimer=null; }
+
+  const q = state.questions[state.qIndex % state.questions.length];
+  state.answered = false;
+  state.firstTry = true;
+  state.currentQ = q;
+
+  // MEJORA C — contador
+  const total = state.questions.length;
+  const current = (state.qIndex % total) + 1;
+  const ctr = document.getElementById('question-counter');
+  if(ctr) ctr.textContent = `Pregunta ${current} de ${total}`;
+
+  // figure
+  document.getElementById('figure-canvas').innerHTML = getSVG(q.svg, q.datos);
+
+  // question label badge
+  const modeLabel = q.tipo === 'input'
+    ? '<span style="background:var(--cyan);color:#000;padding:2px 8px;border-radius:8px;font-size:11px;margin-right:6px;">✏️ ESCRIBE</span>'
+    : '<span style="background:var(--purple);color:#fff;padding:2px 8px;border-radius:8px;font-size:11px;margin-right:6px;">🎯 ELIGE</span>';
+  document.querySelector('.question-label').innerHTML = modeLabel + '🤔 Pregunta';
+  document.getElementById('question-text').textContent = q.pregunta;
+
+  const grid = document.getElementById('options-grid');
+  const inputMode = document.getElementById('input-mode');
+  const fb = document.getElementById('feedback-bar');
+  fb.className = 'feedback-bar'; fb.innerHTML = '';
+
+  // MEJORA B — hide next area
+  document.getElementById('next-big-wrap').classList.remove('show');
+
+  if(q.tipo === 'input') {
+    grid.innerHTML = ''; grid.style.display = 'none';
+    inputMode.style.display = 'block';
+    const inp = document.getElementById('free-input');
+    inp.value = ''; inp.disabled = false;
+    setTimeout(() => inp.focus(), 100);
+  } else {
+    grid.style.display = 'grid'; inputMode.style.display = 'none';
+    grid.innerHTML = '';
+    const shuffled = shuffle(q.opciones.map((o,i)=>({text:o, orig:i})));
+    shuffled.forEach(({text,orig}) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.textContent = text;
+      btn.onclick = () => checkAnswer(orig, q, btn, grid);
+      grid.appendChild(btn);
+    });
+  }
+  document.getElementById('formula-panel').classList.remove('open');
+  updateHUD();
+}
+
+// Check free-input answer
+function checkFreeInput() {
+  const q = state.currentQ;
+  if (!q || state.answered) return;
+  const inp = document.getElementById('free-input');
+  const userVal = parseFloat(inp.value);
+  if (isNaN(userVal)) { inp.style.borderColor = 'var(--red)'; return; }
+
+  const correct = parseFloat(q.correctaVal);
+  // Accept within 1% tolerance or ±0.1 for small numbers
+  const tolerance = Math.max(Math.abs(correct) * 0.02, 0.15);
+  const isCorrect = Math.abs(userVal - correct) <= tolerance;
+
+  const fb = document.getElementById('feedback-bar');
+  inp.disabled = true;
+
+  if (isCorrect) {
+    state.answered = true;
+    const pts = state.firstTry ? 10 : 5;
+    state.pts = Math.max(0, state.pts + pts);
+    state.correctas++;
+    state.streak++;
+    if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+    if (state.streak > 0 && state.streak % 5 === 0) {
+      state.pts += 20;
+      showCelebracion('🔥', `¡Racha de ${state.streak}!`, '+20 puntos bonus 🎉');
+    }
+    inp.style.borderColor = 'var(--green)';
+    fb.className = 'feedback-bar correct';
+    fb.innerHTML = `✅ ¡Correcto! Tu respuesta: <strong>${userVal}</strong> · <strong>+${pts} pts</strong> 🎉<div class="feedback-formula">📐 ${q.formula}</div>`;
+    showNextArea(true);
+    checkMilestone();
+  } else {
+    state.firstTry = false;
+    state.fallos++;
+    state.pts = Math.max(0, state.pts - 2);
+    state.streak = 0;
+    inp.style.borderColor = 'var(--red)';
+    inp.disabled = false; inp.value = '';
+    setTimeout(() => inp.focus(), 50);
+    fb.className = 'feedback-bar wrong';
+    fb.innerHTML = `❌ No exactamente. <strong>−2 pts</strong> · Inténtalo de nuevo<div class="feedback-formula">📐 Fórmula: ${q.formula} · Pista: ${q.feedback}</div>`;
+  }
+  updateHUD();
+}
+
+// ══════════════════════════════════════════════════
+//  CHECK ANSWER (multiple choice)
+// ══════════════════════════════════════════════════
+function checkAnswer(chosenIdx, q, btn, grid) {
+  if(state.answered) return;
+  const allBtns = grid.querySelectorAll('.option-btn');
+  const isCorrect = chosenIdx === q.correcta;
+  const fb = document.getElementById('feedback-bar');
+
+  if(isCorrect) {
+    state.answered = true;
+    btn.classList.add('correct');
+    const pts = state.firstTry ? 10 : 5;
+    state.pts = Math.max(0, state.pts + pts);
+    state.correctas++;
+    state.streak++;
+    if(state.streak > state.bestStreak) state.bestStreak = state.streak;
+    if(state.streak > 0 && state.streak % 5 === 0) {
+      state.pts += 20;
+      showCelebracion('🔥', `¡Racha de ${state.streak}!`, '+20 puntos bonus 🎉');
+    }
+    fb.className = 'feedback-bar correct';
+    fb.innerHTML = `✅ ¡Correcto! <strong>+${pts} pts</strong> 🎉<div class="feedback-formula">📐 ${q.formula}</div>`;
+    allBtns.forEach(b => b.disabled = true);
+    // MEJORA B — show big next + auto-advance
+    showNextArea(true);
+    checkMilestone();
+  } else {
+    state.firstTry = false;
+    state.fallos++;
+    state.pts = Math.max(0, state.pts - 2);
+    state.streak = 0;
+    btn.classList.add('wrong');
+    btn.disabled = true;
+    fb.className = 'feedback-bar wrong';
+    fb.innerHTML = `❌ Incorrecto. <strong>−2 pts</strong><div class="feedback-formula">📐 Fórmula: ${q.formula}</div><div style="font-size:13px;margin-top:4px;color:var(--text2)">Pista: ${q.feedback}</div>`;
+    // show next button without auto-advance (give time to read)
+    showNextArea(false);
+  }
+  updateHUD();
+}
+
+// MEJORA B — auto-advance logic
+function showNextArea(withAutoAdvance) {
+  const wrap = document.getElementById('next-big-wrap');
+  const fill = document.getElementById('auto-fill');
+  const label = document.getElementById('auto-label');
+  wrap.classList.add('show');
+
+  if(withAutoAdvance) {
+    const delay = 3000;
+    fill.style.transition = 'none';
+    fill.style.width = '100%';
+    fill.getBoundingClientRect(); // force reflow
+    fill.style.transition = `width ${delay}ms linear`;
+    fill.style.width = '0%';
+    label.textContent = 'Avanza solo en 3s';
+    autoTimer = setTimeout(nextQuestion, delay);
+  } else {
+    fill.style.width = '0%';
+    label.textContent = 'Lee y continúa cuando quieras';
+  }
+}
+
+function nextQuestion() {
+  if(autoTimer){ clearTimeout(autoTimer); autoTimer=null; }
+  state.qIndex++;
+  renderQuestion();
+}
+
+function checkMilestone() {
+  const milestones = [250,500,750,1000];
+  for(const m of milestones) {
+    if(state.pts >= m && !state.milestoneShown.includes(m)) {
+      state.milestoneShown.push(m);
+      if(m === 1000) { setTimeout(showResultado, 600); }
+      else {
+        const msgs = {250:'¡Buen comienzo! 🌟',500:'¡Ya llevas la mitad! 💪',750:'¡Casi lo tienes! 🚀'};
+        setTimeout(()=>showCelebracion('⭐', `${m} puntos`, msgs[m]), 400);
+      }
+      break;
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  HUD
+// ══════════════════════════════════════════════════
+function updateHUD() {
+  document.getElementById('pts-num').textContent = state.pts;
+  const pct = Math.min(100, (state.pts/1000)*100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').textContent = `${state.pts} / 1000 pts`;
+  document.getElementById('streak-display').textContent = `🔥 Racha: ${state.streak}`;
+}
+
+// ══════════════════════════════════════════════════
+//  FORMULAS PANEL
+// ══════════════════════════════════════════════════
+function buildFormulaPanel(nivel) {
+  document.getElementById('formula-list').innerHTML = FORMULAS_NIVEL[nivel].map(f =>
+    `<div class="formula-row"><span class="fkey">${f.k}</span><span class="fval">${f.v}</span></div>`
+  ).join('');
+}
+function toggleFormulas() {
+  document.getElementById('formula-panel').classList.toggle('open');
+}
+
+// ══════════════════════════════════════════════════
+//  CELEBRACIÓN
+// ══════════════════════════════════════════════════
+function showCelebracion(emoji, title, sub) {
+  document.getElementById('cel-emoji').textContent = emoji;
+  document.getElementById('cel-title').textContent = title;
+  document.getElementById('cel-sub').textContent = sub;
+  document.getElementById('celebracion').classList.add('show');
+  spawnConfetti();
+}
+function closeCelebracion() { document.getElementById('celebracion').classList.remove('show'); }
+function spawnConfetti() {
+  const colors = ['#7C3AED','#EC4899','#06B6D4','#F59E0B','#10B981','#FCD34D'];
+  for(let i=0;i<30;i++) {
+    setTimeout(()=>{
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.cssText = `left:${Math.random()*100}vw;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${1.5+Math.random()}s;animation-delay:${Math.random()*0.5}s;transform:rotate(${Math.random()*360}deg);width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(), 2500);
+    }, i*50);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  RESULTADO
+// ══════════════════════════════════════════════════
+function showResultado() {
+  closeCelebracion();
+  // MEJORA A — guardar nivel completado
+  saveCompleted(state.nivel);
+  document.getElementById('stat-pts').textContent = state.pts;
+  document.getElementById('stat-correctas').textContent = state.correctas;
+  document.getElementById('stat-fallos').textContent = state.fallos;
+  document.getElementById('stat-racha').textContent = state.bestStreak;
+  const pct = state.correctas / (state.correctas + state.fallos) * 100;
+  let emoji='🏆', title='¡NIVEL SUPERADO!', sub='¡Has conseguido 1.000 puntos! Eres un crack 🎉';
+  if(pct < 50){ emoji='💪'; }
+  else if(pct > 90){ emoji='🌟'; sub='¡Resultado perfecto! Sin casi ningún fallo 🌟'; }
+  document.getElementById('res-emoji').textContent = emoji;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-sub').textContent = sub;
+  const nombre = {aprendiz:'Bronce 🥉',medio:'Plata 🥈',avanzado:'Oro 🥇'}[state.nivel];
+  const trofeos = [{text:`Trofeo ${nombre}`, earned:true}];
+  if(state.fallos === 0) trofeos.push({text:'🎯 Sin fallos', earned:true});
+  if(state.bestStreak >= 5) trofeos.push({text:`🔥 Racha x${state.bestStreak}`, earned:true});
+  if(state.bestStreak < 5) trofeos.push({text:'🔥 Racha x5', earned:false});
+  document.getElementById('trofeos').innerHTML = trofeos.map(t =>
+    `<div class="trofeo ${t.earned?'earned':''}">${t.earned?'✅':'🔒'} ${t.text}</div>`
+  ).join('');
+  spawnConfetti();
+  goTo('resultado');
+}
+
+// ══════════════════════════════════════════════════
+//  EXIT — modal personalizado (sin confirm nativo)
+// ══════════════════════════════════════════════════
+function confirmExit() {
+  if(autoTimer){ clearTimeout(autoTimer); autoTimer=null; }
+  document.getElementById('exit-modal').classList.add('show');
+}
+function closeExitModal() { document.getElementById('exit-modal').classList.remove('show'); }
+function doExit() { document.getElementById('exit-modal').classList.remove('show'); goTo('home'); }
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+buildGlosario();
+refreshSavedUI();
+</script>
+</body>
+</html>
